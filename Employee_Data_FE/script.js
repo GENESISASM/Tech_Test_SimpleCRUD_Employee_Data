@@ -1,13 +1,13 @@
-// URL Backend Spring Boot kita
 const API_URL = "http://localhost:8080/api/employees";
-let isEditMode = false; // Penanda apakah sedang Edit atau Tambah
+let isEditMode = false;
 
-// Dijalankan otomatis saat halaman dibuka
 $(document).ready(function () {
     loadData();
+    $("#searchInput").on("keyup", function () {
+        searchData();
+    });
 });
 
-// 1. GET ALL DATA
 function loadData() {
     $.ajax({
         url: API_URL,
@@ -45,11 +45,24 @@ function loadData() {
     });
 }
 
-// 2. SAVE DATA (Bisa POST untuk Tambah, PUT untuk Edit)
+function searchData() {
+    let keyword = $("#searchInput").val().toLowerCase().trim();
+
+    $("#table-body tr").each(function () {
+        let nik = $(this).find("td:eq(1)").text().toLowerCase();
+        let name = $(this).find("td:eq(2)").text().toLowerCase();
+
+        if (nik.includes(keyword) || name.includes(keyword)) {
+            $(this).show();
+        } else {
+            $(this).hide();
+        }
+    });
+}
+
 function saveData() {
-    // Ambil nilai dari form
     let payload = {
-        id: $("#nik").val(), // Di Backend kita pakai 'id' untuk menampung NIK
+        id: $("#nik").val(),
         name: $("#name").val(),
         gender: $("input[name='gender']:checked").val(),
         dateOfBirth: $("#dob").val(),
@@ -81,9 +94,7 @@ function saveData() {
     });
 }
 
-// 3. DELETE DATA
 function deleteData(id, name) {
-    // Mirip mockup PDF: Pop up konfirmasi
     if (confirm(`Anda yakin menghapus data ${name} ?`)) {
         $.ajax({
             url: `${API_URL}/${id}`,
@@ -96,19 +107,17 @@ function deleteData(id, name) {
     }
 }
 
-// 4. EDIT DATA (Tampilkan form dengan data terisi)
 function editData(id) {
     $.get(`${API_URL}/${id}`, function (emp) {
         isEditMode = true;
         $("#form-title").text("Edit Data Karyawan");
         $("#originalId").val(emp.id);
         $("#nik").val(emp.id);
-        // Kalau edit, NIK (Primary Key) tidak boleh diubah
         $("#nik").prop("readonly", true);
 
         $("#name").val(emp.name);
-        if (emp.gender == "Laki-laki") $("#genderL").prop("checked", true);
-        if (emp.gender == "Perempuan") $("#genderP").prop("checked", true);
+        if (emp.gender === "Laki-laki") $("#genderL").prop("checked", true);
+        if (emp.gender === "Perempuan") $("#genderP").prop("checked", true);
         $("#dob").val(emp.dateOfBirth);
         $("#address").val(emp.address);
         $("#nationality").val(emp.nationality);
@@ -119,17 +128,15 @@ function editData(id) {
     });
 }
 
-// 5. DETAIL DATA (Hanya baca, tombol simpan disembunyikan)
 function detailData(id) {
-    editData(id); // Gunakan fungsi edit untuk mengisi data
+    editData(id);
     setTimeout(() => {
         $("#form-title").text("Detail Data Karyawan");
-        disableForm(); // Matikan semua input
-        $("#btnSave").hide(); // Sembunyikan tombol simpan
+        disableForm();
+        $("#btnSave").hide();
     }, 100);
 }
 
-// FUNGSI NAVIGASI UI
 function showMonitoring() {
     $("#form-section").hide();
     $("#monitoring-section").fadeIn();
@@ -138,8 +145,8 @@ function showMonitoring() {
 function showAddForm() {
     isEditMode = false;
     $("#form-title").text("Tambah Data Baru");
-    $("#employeeForm")[0].reset(); // Kosongkan form
-    $("#nik").prop("readonly", false); // Buka kunci NIK
+    $("#employeeForm")[0].reset();
+    $("#nik").prop("readonly", false);
     enableForm();
 
     $("#form-section").fadeIn();
