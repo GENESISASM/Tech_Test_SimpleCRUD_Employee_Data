@@ -15,7 +15,6 @@ function loadData() {
         success: function (response) {
             let html = "";
             response.forEach((emp, index) => {
-                // Hitung umur dari tanggal lahir
                 let birthDate = new Date(emp.dateOfBirth);
                 let ageDifMs = Date.now() - birthDate.getTime();
                 let ageDate = new Date(ageDifMs);
@@ -116,8 +115,8 @@ function editData(id) {
         $("#nik").prop("readonly", true);
 
         $("#name").val(emp.name);
-        if (emp.gender === "Laki-laki") $("#genderL").prop("checked", true);
-        if (emp.gender === "Perempuan") $("#genderP").prop("checked", true);
+        if (emp.gender == "Laki-laki") $("#genderL").prop("checked", true);
+        if (emp.gender == "Perempuan") $("#genderP").prop("checked", true);
         $("#dob").val(emp.dateOfBirth);
         $("#address").val(emp.address);
         $("#nationality").val(emp.nationality);
